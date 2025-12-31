@@ -1,18 +1,245 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Client</title>
+    <meta charset="UTF-8">
+    <title>Ocean Fresh Seafood – Client</title>
+
+    <!-- ================= BASE LAYOUT ================= -->
     <style>
-        body { margin: 0; font-family: Arial; background: #f4f6f8; }
-        header { background: #2563eb; color: white; padding: 15px; }
-        nav { display: flex; gap: 20px; cursor: pointer; }
-        .container { display: flex; }
-        .content { flex: 3; padding: 20px; }
-        .cart { flex: 1; background: white; padding: 20px; border-left: 1px solid #ddd; }
-        .hidden { display: none; }
-        button { padding: 5px 10px; }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f8;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: white;
+            padding: 18px 25px;
+        }
+
+        nav {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 90px);
+        }
+
+        .content {
+            flex: 3;
+            padding: 25px;
+        }
+
+        .cart {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 25px;
+            border-left: 1px solid #ddd;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        button, a {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #2563eb;
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        button:hover, a:hover {
+            opacity: 0.9;
+        }
+    </style>
+
+    <!-- ================= SHOP CSS ================= -->
+    <style>
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #2563eb;
+        }
+
+        .product-name {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 8px;
+        }
+
+        .product-category {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 0.8em;
+            margin-bottom: 12px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+        }
+
+        .customer-price {
+            color: #16a34a;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
+        .add-btn {
+            width: 100%;
+            margin-top: 12px;
+            background: #16a34a;
+        }
+    </style>
+
+    <!-- ================= ORDERS CSS ================= -->
+    <style>
+        .orders-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .orders-header h2 {
+            color: #1e40af;
+            margin: 0;
+        }
+
+        .order-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+
+        .order-card:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            border-color: #2563eb;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed #e5e7eb;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .order-no {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+        .order-date {
+            font-size: 0.85em;
+            color: #6b7280;
+        }
+
+        .order-status {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+        }
+
+        .status-PLACED {
+            background: #fff7ed;
+            color: #9a3412;
+        }
+
+        .status-COMPLETED {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-DELIVERED {
+            background: #e0f2fe;
+            color: #075985;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #1e40af;
+        }
+
+        .item-meta {
+            font-size: 0.85em;
+            color: #6b7280;
+        }
+
+        .item-price {
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+        .order-footer {
+            margin-top: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .delete-btn {
+            background: #dc2626;
+        }
+
+        .invoice-btn {
+            background: #0ea5e9;
+        }
+
+        .no-orders {
+            text-align: center;
+            padding: 60px;
+            color: #9ca3af;
+        }
     </style>
 </head>
+
 <body>
 
 <header>
@@ -26,37 +253,37 @@
 
 <div class="container">
 
-    <!-- SHOP -->
+    <!-- ================= SHOP ================= -->
     <div class="content" id="shop">
-        <h2>Shop</h2>
-        <div id="products"></div>
+        <h2 style="color:#1e40af;">🛒 Shop Fresh Seafood</h2>
+        <div id="products" class="products-grid"></div>
     </div>
 
-    
-    <!-- ORDERS SECTION -->
-<div id="orders" class="content hidden">
-    <h2>Orders</h2>
-
-    <div style="margin-bottom: 15px;">
-        <button onclick="loadOrders('active')">Active Orders</button>
-        <button onclick="loadOrders('completed')">Previous Orders</button>
+    <!-- ================= ORDERS ================= -->
+    <div class="content hidden" id="orders">
+        <div class="orders-header">
+            <h2>📦 My Orders</h2>
+            <div>
+                <button onclick="loadOrders('active')">Active</button>
+                <button onclick="loadOrders('completed')">Completed</button>
+            </div>
+        </div>
+        <div id="orderList"></div>
     </div>
 
-    <div id="ordersList"></div>
-</div>
-
-
-    <!-- NOTIFICATIONS -->
+    <!-- ================= NOTIFICATIONS ================= -->
     <div class="content hidden" id="notify">
-        <h2>Notifications</h2>
+        <h2>🔔 Notifications</h2>
         <p>No notifications</p>
     </div>
 
-    <!-- CART -->
+    <!-- ================= CART ================= -->
     <div class="cart">
-        <h3>Cart</h3>
-        <div id="cartItems"></div>
-        <button onclick="placeOrder()">Place Order</button>
+        <h3>🛒 Cart</h3>
+        <div id="cartItems">Cart is empty</div>
+        <button onclick="placeOrder()" style="width:100%; margin-top:15px;">
+            Place Order
+        </button>
     </div>
 
 </div>
@@ -65,11 +292,13 @@
 const customerId = "{{ customer_id }}";
 let cart = [];
 
+/* NAV */
 function show(id) {
     document.querySelectorAll('.content').forEach(d => d.classList.add("hidden"));
     document.getElementById(id).classList.remove("hidden");
 }
 
+/* SHOP */
 function loadShop() {
     fetch(`/api/shop/${customerId}`)
         .then(r => r.json())
@@ -78,10 +307,17 @@ function loadShop() {
             div.innerHTML = "";
             data.forEach(p => {
                 div.innerHTML += `
-                  <div>
-                    ${p.name} - ₹${p.price}
-                    <button onclick='addToCart(${JSON.stringify(p)})'>+</button>
-                  </div>
+                    <div class="product-card">
+                        <div class="product-name">${p.name}</div>
+                        <div class="product-category">${p.category || "Seafood"}</div>
+                        <div class="price-row">
+                            <span>Price</span>
+                            <span class="customer-price">₹${p.price}</span>
+                        </div>
+                        <button class="add-btn" onclick='addToCart(${JSON.stringify(p)})'>
+                            Add to Cart
+                        </button>
+                    </div>
                 `;
             });
         });
@@ -96,135 +332,86 @@ function addToCart(p) {
 
 function renderCart() {
     const div = document.getElementById("cartItems");
+    if (!cart.length) {
+        div.innerHTML = "Cart is empty";
+        return;
+    }
     div.innerHTML = "";
     cart.forEach(i => {
-        div.innerHTML += `<p>${i.name} x ${i.quantity}</p>`;
+        div.innerHTML += `<p>${i.name} × ${i.quantity}</p>`;
     });
 }
 
+/* PLACE ORDER */
 function placeOrder() {
     fetch("/api/order/place", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            customer_id: customerId,
-            items: cart
-        })
+        body: JSON.stringify({ customer_id: customerId, items: cart })
     }).then(() => {
         cart = [];
         renderCart();
-        alert("Order placed");
+        alert("Order placed successfully");
     });
 }
 
-function placeOrder() {
-    if (cart.length === 0) {
-        alert("Cart is empty");
-        return;
-    }
-
-    fetch("/api/order/place", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            customer_id: customerId,
-            items: cart
-        })
-    })
-    .then(res => {
-        if (!res.ok) throw new Error("Order failed");
-        return res.json();
-    })
-    .then(() => {
-        cart = [];
-        renderCart();
-        alert("Order placed");
-        loadOrders("active");
-    })
-    .catch(err => {
-        alert("Failed to place order");
-        console.error(err);
-    });
-}
-
-loadShop();
-</script>
-<script>
+/* LOAD ORDERS */
 function loadOrders(type) {
     fetch(`/api/orders/${customerId}/${type}`)
         .then(res => res.json())
         .then(data => {
-            const div = document.getElementById("ordersList");
+            const div = document.getElementById("orderList");
             div.innerHTML = "";
 
-            if (data.length === 0) {
-                div.innerHTML = "<p>No orders found.</p>";
+            if (!data.length) {
+                div.innerHTML = `<div class="no-orders">No orders found</div>`;
                 return;
             }
 
             data.forEach(o => {
-                let html = `
-                  <div class="order-card">
-                    <b>Order ${o.order_no}</b><br>
-                    Status: <b>${o.status}</b><br>
-                `;
+                let itemsHtml = "";
+              
 
-                // PLACED → edit & delete
+                let actions = "";
                 if (o.status === "PLACED") {
-                    html += `
-                      <button onclick="editOrder('${o.id}')">Edit</button>
-                      <button onclick="deleteOrder('${o.id}')">Delete</button>
-                    `;
+                    actions = `<button class="delete-btn" onclick="deleteOrder('${o.id}')">Cancel</button>
+                    <button class="edit-btn" >Edit</button>`;
                 }
-
-                // ACCEPTED → arrival date
-                if (o.status === "ACCEPTED") {
-                    html += `<p>Arrival Date: ${o.arrival_date}</p>`;
-                }
-
-                // DELIVERED → invoice
                 if (o.status === "DELIVERED") {
-                    html += `
-                      <button onclick="openInvoice('${o.id}')">
-                        View Invoice
-                      </button>
-                    `;
+                    actions += `<a class="invoice-btn" href="/invoice/${o.id}" target="_blank">Invoice</a>`;
                 }
-
-                // COMPLETED → details only
+                if (o.status === "ACCEPTED") {
+                    actions += `<p class="arrival-date"  >Arrival Date: ${o.arrival_date}</p>`;
+                }
                 if (o.status === "COMPLETED") {
-                    html += `
-                      <button onclick="viewOrderDetails('${o.id}')">
-                        Details
-                      </button>
-                    `;
+                    actions = `<button class="view-detail-btn" >View Details</button>`;
                 }
 
-                html += "</div><hr>";
-                div.innerHTML += html;
+                div.innerHTML += `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <div class="order-no">Order #${o.order_no}</div>
+                                <div class="order-date">${new Date(o.created_at).toLocaleString()}</div>
+                            </div>
+                            <span class="order-status status-${o.status}">${o.status}</span>
+                        </div>
+                        ${itemsHtml}
+                        <div class="order-footer">${actions}</div>
+                    </div>
+                `;
             });
         });
 }
 
-function deleteOrder(id) {
-    if (!confirm("Delete this order?")) return;
-    fetch(`/api/order/delete/${id}`, { method: "DELETE" })
+function deleteOrder(orderId) {
+    if (!confirm("Cancel this order?")) return;
+    fetch(`/api/order/delete/${orderId}`, { method: "DELETE" })
         .then(() => loadOrders("active"));
 }
 
-function openInvoice(id) {
-    window.open(`/invoice/${id}`, "_blank");
-}
-
-function editOrder(id) {
-    alert("Edit order UI (POC placeholder)");
-}
-
-function viewOrderDetails(id) {
-    alert("Order details (POC placeholder)");
-}
+loadShop();
 </script>
-
 
 </body>
 </html>
