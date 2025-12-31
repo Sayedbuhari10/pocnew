@@ -1,67 +1,230 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Client Dashboard</title>
+    <title>Client</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background: #2563eb;
-            color: white;
-            padding: 15px 30px;
-        }
-        .container {
-            padding: 30px;
-        }
-        h2 {
-            margin-bottom: 20px;
-        }
-        ul {
-            background: white;
-            padding: 0;
-            list-style: none;
-            border-radius: 6px;
-            max-width: 500px;
-        }
-        li {
-            padding: 12px 16px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        li:last-child {
-            border-bottom: none;
-        }
+        body { margin: 0; font-family: Arial; background: #f4f6f8; }
+        header { background: #2563eb; color: white; padding: 15px; }
+        nav { display: flex; gap: 20px; cursor: pointer; }
+        .container { display: flex; }
+        .content { flex: 3; padding: 20px; }
+        .cart { flex: 1; background: white; padding: 20px; border-left: 1px solid #ddd; }
+        .hidden { display: none; }
+        button { padding: 5px 10px; }
     </style>
 </head>
 <body>
 
 <header>
     Welcome, {{ customer_name }}
+    <nav>
+        <span onclick="show('shop')">Shop</span>
+        <span onclick="show('orders')">Orders</span>
+        <span onclick="show('notify')">Notifications</span>
+    </nav>
 </header>
 
 <div class="container">
-    <h2>Available Products</h2>
 
-    <ul id="product-list"></ul>
+    <!-- SHOP -->
+    <div class="content" id="shop">
+        <h2>Shop</h2>
+        <div id="products"></div>
+    </div>
+
+    
+    <!-- ORDERS SECTION -->
+<div id="orders" class="content hidden">
+    <h2>Orders</h2>
+
+    <div style="margin-bottom: 15px;">
+        <button onclick="loadOrders('active')">Active Orders</button>
+        <button onclick="loadOrders('completed')">Previous Orders</button>
+    </div>
+
+    <div id="ordersList"></div>
+</div>
+
+
+    <!-- NOTIFICATIONS -->
+    <div class="content hidden" id="notify">
+        <h2>Notifications</h2>
+        <p>No notifications</p>
+    </div>
+
+    <!-- CART -->
+    <div class="cart">
+        <h3>Cart</h3>
+        <div id="cartItems"></div>
+        <button onclick="placeOrder()">Place Order</button>
+    </div>
+
 </div>
 
 <script>
 const customerId = "{{ customer_id }}";
+let cart = [];
 
-fetch(`/api/product-names/${customerId}`)
-  .then(res => res.json())
-  .then(data => {
-    const list = document.getElementById("product-list");
-    data.forEach(name => {
-        const li = document.createElement("li");
-        li.textContent = name;
-        list.appendChild(li);
+function show(id) {
+    document.querySelectorAll('.content').forEach(d => d.classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
+}
+
+function loadShop() {
+    fetch(`/api/shop/${customerId}`)
+        .then(r => r.json())
+        .then(data => {
+            const div = document.getElementById("products");
+            div.innerHTML = "";
+            data.forEach(p => {
+                div.innerHTML += `
+                  <div>
+                    ${p.name} - ₹${p.price}
+                    <button onclick='addToCart(${JSON.stringify(p)})'>+</button>
+                  </div>
+                `;
+            });
+        });
+}
+
+function addToCart(p) {
+    let item = cart.find(i => i.id === p.id);
+    if (item) item.quantity++;
+    else cart.push({ ...p, quantity: 1 });
+    renderCart();
+}
+
+function renderCart() {
+    const div = document.getElementById("cartItems");
+    div.innerHTML = "";
+    cart.forEach(i => {
+        div.innerHTML += `<p>${i.name} x ${i.quantity}</p>`;
     });
-  });
+}
+
+function placeOrder() {
+    fetch("/api/order/place", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            customer_id: customerId,
+            items: cart
+        })
+    }).then(() => {
+        cart = [];
+        renderCart();
+        alert("Order placed");
+    });
+}
+
+function placeOrder() {
+    if (cart.length === 0) {
+        alert("Cart is empty");
+        return;
+    }
+
+    fetch("/api/order/place", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            customer_id: customerId,
+            items: cart
+        })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Order failed");
+        return res.json();
+    })
+    .then(() => {
+        cart = [];
+        renderCart();
+        alert("Order placed");
+        loadOrders("active");
+    })
+    .catch(err => {
+        alert("Failed to place order");
+        console.error(err);
+    });
+}
+
+loadShop();
 </script>
+<script>
+function loadOrders(type) {
+    fetch(`/api/orders/${customerId}/${type}`)
+        .then(res => res.json())
+        .then(data => {
+            const div = document.getElementById("ordersList");
+            div.innerHTML = "";
+
+            if (data.length === 0) {
+                div.innerHTML = "<p>No orders found.</p>";
+                return;
+            }
+
+            data.forEach(o => {
+                let html = `
+                  <div class="order-card">
+                    <b>Order ${o.order_no}</b><br>
+                    Status: <b>${o.status}</b><br>
+                `;
+
+                // PLACED → edit & delete
+                if (o.status === "PLACED") {
+                    html += `
+                      <button onclick="editOrder('${o.id}')">Edit</button>
+                      <button onclick="deleteOrder('${o.id}')">Delete</button>
+                    `;
+                }
+
+                // ACCEPTED → arrival date
+                if (o.status === "ACCEPTED") {
+                    html += `<p>Arrival Date: ${o.arrival_date}</p>`;
+                }
+
+                // DELIVERED → invoice
+                if (o.status === "DELIVERED") {
+                    html += `
+                      <button onclick="openInvoice('${o.id}')">
+                        View Invoice
+                      </button>
+                    `;
+                }
+
+                // COMPLETED → details only
+                if (o.status === "COMPLETED") {
+                    html += `
+                      <button onclick="viewOrderDetails('${o.id}')">
+                        Details
+                      </button>
+                    `;
+                }
+
+                html += "</div><hr>";
+                div.innerHTML += html;
+            });
+        });
+}
+
+function deleteOrder(id) {
+    if (!confirm("Delete this order?")) return;
+    fetch(`/api/order/delete/${id}`, { method: "DELETE" })
+        .then(() => loadOrders("active"));
+}
+
+function openInvoice(id) {
+    window.open(`/invoice/${id}`, "_blank");
+}
+
+function editOrder(id) {
+    alert("Edit order UI (POC placeholder)");
+}
+
+function viewOrderDetails(id) {
+    alert("Order details (POC placeholder)");
+}
+</script>
+
 
 </body>
 </html>
