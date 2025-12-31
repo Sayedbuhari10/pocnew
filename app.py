@@ -1,12 +1,19 @@
 from flask import Flask, render_template, request, redirect, url_for
 from bson.objectid import ObjectId
+from werkzeug.security import generate_password_hash
 from db import products, customers, customer_prices
-from flask import Flask, render_template, jsonify
-from pymongo import MongoClient
+from client_routes import client_bp
+from order_routes import order_bp
 import os
 
-
 app = Flask(__name__)
+
+app.register_blueprint(client_bp)
+app.register_blueprint(order_bp)
+# -----------------------------
+# REGISTER CLIENT BLUEPRINT
+# -----------------------------
+
 
 # -----------------------------
 # ADMIN DASHBOARD
@@ -20,7 +27,6 @@ def admin_dashboard():
         products=all_products,
         customers=all_customers
     )
-    
 
 # -----------------------------
 # CREATE PRODUCT
@@ -57,13 +63,14 @@ def delete_product(id):
     return redirect(url_for("admin_dashboard"))
 
 # -----------------------------
-# CREATE CUSTOMER
+# CREATE CUSTOMER (ADMIN SETS PASSWORD)
 # -----------------------------
 @app.route("/admin/customer/create", methods=["POST"])
 def create_customer():
     customers.insert_one({
         "name": request.form["name"],
-        "email": request.form["email"]
+        "email": request.form["email"],
+        "password": generate_password_hash(request.form["password"])
     })
     return redirect(url_for("admin_dashboard"))
 
@@ -72,77 +79,19 @@ def create_customer():
 # -----------------------------
 @app.route("/admin/price/set", methods=["POST"])
 def set_customer_price():
-    customer_id = request.form["customer_id"]
-    product_id = request.form["product_id"]
-    price = float(request.form["price"])
-
     customer_prices.update_one(
         {
-            "customer_id": customer_id,
-            "product_id": product_id
+            "customer_id": request.form["customer_id"],
+            "product_id": request.form["product_id"]
         },
-        {"$set": {"price": price}},
+        {"$set": {"price": float(request.form["price"])}},
         upsert=True
     )
     return redirect(url_for("admin_dashboard"))
-@app.route("/login")
-def login_page():
-    return render_template("login.html")
-@app.route("/login", methods=["POST"])
-def login():
-    email = request.form["email"]
-    name = request.form["name"]
 
-    customer = customers.find_one({
-        "email": email,
-        "name": name
-    })
-
-    if not customer:
-        return render_template(
-            "login.html",
-            error="Invalid name or email"
-        )
-
-    # Redirect with customer_id (stateless)
-    return redirect(
-        url_for("client_page", customer_id=str(customer["_id"]))
-    )
-
-
-
-
-# SAME MongoDB connection
-
-@app.route("/client/<customer_id>")
-def client_page(customer_id):
-    customer = customers.find_one({"_id": ObjectId(customer_id)})
-
-    if not customer:
-        return "Unauthorized", 401
-
-    return render_template(
-        "client.html",
-        customer_name=customer["name"],
-        customer_id=customer_id
-    )
-
-@app.route("/api/product-names/<customer_id>")
-def product_names(customer_id):
-    customer = customers.find_one({"_id": ObjectId(customer_id)})
-
-    if not customer:
-        return jsonify({"error": "Unauthorized"}), 401
-
-    docs = products.find({}, {"_id": 0, "name": 1})
-    names = [d["name"] for d in docs]
-    return jsonify(names)
-
-
-
-
+# -----------------------------
+# APP ENTRY POINT
+# -----------------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
-
