@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Client Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #2563eb;
+            color: white;
+            padding: 15px 30px;
+        }
+        .container {
+            padding: 30px;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        ul {
+            background: white;
+            padding: 0;
+            list-style: none;
+            border-radius: 6px;
+            max-width: 500px;
+        }
+        li {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    Welcome, {{ customer_name }}
+</header>
+
+<div class="container">
+    <h2>Available Products</h2>
+
+    <ul id="product-list"></ul>
+</div>
+
+<script>
+const customerId = "{{ customer_id }}";
+
+fetch(`/api/product-names/${customerId}`)
+  .then(res => res.json())
+  .then(data => {
+    const list = document.getElementById("product-list");
+    data.forEach(name => {
+        const li = document.createElement("li");
+        li.textContent = name;
+        list.appendChild(li);
+    });
+  });
+</script>
+
+</body>
+</html>
