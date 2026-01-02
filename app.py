@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash
 from db import products, customers, customer_prices
 from client_routes import client_bp
 from order_routes import order_bp
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 import os
 
 app = Flask(__name__)
@@ -13,6 +14,9 @@ app.register_blueprint(order_bp)
 # -----------------------------
 # REGISTER CLIENT BLUEPRINT
 # -----------------------------
+@app.route("/admin/home")
+def admin_home():
+    return render_template("admin_home.html")
 
 
 # -----------------------------
@@ -51,16 +55,20 @@ def update_product(id):
             "base_price": float(request.form["price"])
         }}
     )
-    return redirect(url_for("admin_dashboard"))
+    return jsonify({"message": "Product updated"})
 
 # -----------------------------
 # DELETE PRODUCT
 # -----------------------------
-@app.route("/admin/product/delete/<id>")
-def delete_product(id):
-    products.delete_one({"_id": ObjectId(id)})
-    customer_prices.delete_many({"product_id": id})
+@app.route("/admin/product/delete-multiple", methods=["POST"])
+def delete_multiple_products():
+    ids = request.form.getlist("product_ids")
+    for pid in ids:
+        products.delete_one({"_id": ObjectId(pid)})
+        customer_prices.delete_many({"product_id": pid})
+
     return redirect(url_for("admin_dashboard"))
+
 
 # -----------------------------
 # CREATE CUSTOMER (ADMIN SETS PASSWORD)
@@ -88,6 +96,13 @@ def set_customer_price():
         upsert=True
     )
     return redirect(url_for("admin_dashboard"))
+
+
+
+@app.route("/admin/customer/edit/<id>")
+def edit_customer_page(id):
+    return render_template("edit_customer.html")
+
 
 # -----------------------------
 # APP ENTRY POINT
