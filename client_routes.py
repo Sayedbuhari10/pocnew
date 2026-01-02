@@ -1,13 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 from bson.objectid import ObjectId
-from werkzeug.security import check_password_hash
-from db import customers, products, customer_prices
-
-client_bp = Blueprint("client", __name__)
-
-# -----------------------------
-# LOGIN PAGE
-# -----------------------------
+from werkzeug
 @client_bp.route("/login")
 def login_page():
     return render_template("login.html")
