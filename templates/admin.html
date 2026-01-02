@@ -1,183 +1,234 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>Admin Panel</title>
-
     <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(120deg, #eef2f7, #dfe7ef);
-            margin: 0;
-            padding: 0;
-        }
+        body { margin:0; font-family: Arial; background:#f4f6f8; }
+        header { background:#1e293b; color:white; padding:15px; }
+        nav span { margin-right:20px; cursor:pointer; }
+        .container { padding:20px; }
+        .hidden { display:none; }
+        table { width:100%; background:white; border-collapse: collapse; }
+        th, td { padding:10px; border-bottom:1px solid #ddd; }
+        button { padding:5px 10px; }
+        .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.1);
-            animation: fadeIn 0.5s ease-in-out;
-        }
+.modal-box {
+    background: white;
+    padding: 20px;
+    width: 300px;
+    border-radius: 6px;
+}
 
-        h2 {
-            color: #333;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 8px;
-            margin-top: 30px;
-        }
+.hidden {
+    display: none;
+}
 
-        form {
-            margin-top: 15px;
-            margin-bottom: 25px;
-        }
-
-        input, select, button {
-            padding: 10px 12px;
-            margin: 6px 4px;
-            border-radius: 6px;
-            border: 1px solid #cbd5e1;
-            font-size: 14px;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #2563eb;
-        }
-
-        button {
-            background: #2563eb;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        button:hover {
-            background: #1d4ed8;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        li {
-            background: #f8fafc;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 8px;
-            transition: transform 0.2s, background 0.2s;
-        }
-
-        li:hover {
-            background: #eef2f7;
-            transform: scale(1.01);
-        }
-
-        .delete-link {
-            color: #b91c1c;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .delete-link:hover {
-            text-decoration: underline;
-        }
-
-        hr {
-            border: none;
-            border-top: 1px solid #e5e7eb;
-            margin: 30px 0;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(15px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 600px) {
-            li {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            input, select, button {
-                width: 100%;
-            }
-        }
     </style>
 </head>
 <body>
 
+<header>
+    Admin Panel
+    <nav>
+        <span onclick="show('home')">Home</span>
+        <span onclick="show('products')">Products</span>
+        <span onclick="show('customers')">Customers</span>
+        <span onclick="show('orders')">Orders</span>
+    </nav>
+</header>
+
 <div class="container">
 
-    <h2>Add Product</h2>
+<!-- HOME -->
+<div id="home">
+    <h2>Admin Home</h2>
+    <p>Welcome Admin</p>
+</div>
+
+<!-- PRODUCTS -->
+<!-- PRODUCTS -->
+<div id="products" class="hidden">
+    <h2>Products</h2>
+
+    <!-- ADD PRODUCT -->
     <form action="/admin/product/create" method="post">
         <input name="name" placeholder="Product name" required>
-        <input name="price" type="number" step="0.01" placeholder="Base price" required>
+        <input name="price" placeholder="Price" required>
         <button>Add Product</button>
     </form>
 
-    <h2>Products</h2>
-    <ul>
-        {% for p in products %}
-        <li>
-            <strong>{{ p.name }}</strong> – {{ p.base_price }}
+    <!-- DELETE SELECTED -->
+    <form action="/admin/product/delete-multiple" method="post">
+        <button type="submit" style="margin:10px 0; background:#dc2626; color:white;">
+            Delete Selected Products
+        </button>
 
-            <form action="/admin/product/update/{{ p._id }}" method="post" style="display:inline">
-                <input name="name" value="{{ p.name }}">
-                <input name="price" value="{{ p.base_price }}">
-                <button>Update</button>
-            </form>
+        <table>
+            <tr>
+                <th>Select</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Edit</th>
+            </tr>
 
-            <a href="/admin/product/delete/{{ p._id }}" class="delete-link">Delete</a>
-        </li>
-        {% endfor %}
-    </ul>
+            {% for p in products %}
+            <tr id="product-row-{{ p._id }}">
 
-    <hr>
+                <td>
+                    <input type="checkbox" name="product_ids" value="{{ p._id }}">
+                </td>
+                <td>{{ p.name }}</td>
+                <td>{{ p.base_price }}</td>
+                <td>
+                  <button type="button"
+        onclick="openEditProduct('{{ p._id }}','{{ p.name }}','{{ p.base_price }}')">
+    Edit
+</button>
 
-    <h2>Add Customer</h2>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </form>
+</div>
+
+
+<!-- CUSTOMERS -->
+<div id="customers" class="hidden">
+    <h2>Customers</h2>
+
     <form action="/admin/customer/create" method="post">
-        <input name="name" placeholder="Customer name" required>
+        <input name="name" placeholder="Name" required>
         <input name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-
+        <input name="password" placeholder="Password" required>
         <button>Add Customer</button>
     </form>
 
-    <h2>Set Customer Price</h2>
-    <form action="/admin/price/set" method="post">
-        <select name="customer_id" required>
-            {% for c in customers %}
-                <option value="{{ c._id }}">{{ c.name }}</option>
-            {% endfor %}
-        </select>
+    <table>
+        <tr><th>Name</th><th>Email</th><th>Action</th></tr>
+        {% for c in customers %}
+        <tr>
+            <td>{{ c.name }}</td>
+            <td>{{ c.email }}</td>
+            <td>
+                <a href="/admin/customer/edit/{{ c._id }}">Edit</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
 
-        <select name="product_id" required>
-            {% for p in products %}
-                <option value="{{ p._id }}">{{ p.name }}</option>
-            {% endfor %}
-        </select>
-
-        <input name="price" type="number" step="0.01" placeholder="Custom price" required>
-        <button>Set Price</button>
-    </form>
+<!-- ORDERS -->
+<div id="orders" class="hidden">
+    <h2>Orders</h2>
+    <p>Order management will be added here.</p>
+</div>
 
 </div>
+
+<script>
+function show(id) {
+    localStorage.setItem("admin_active_section", id);
+
+    document.querySelectorAll(".container > div")
+        .forEach(d => d.classList.add("hidden"));
+
+    document.getElementById(id).classList.remove("hidden");
+}
+window.onload = function () {
+    const section = localStorage.getItem("admin_active_section") || "home";
+    show(section);
+};
+
+</script>
+<script>
+    let editingProductId = null;
+
+function openEditProduct(id, name, price) {
+    editingProductId = id;
+
+    document.getElementById("editProductName").value = name;
+    document.getElementById("editProductPrice").value = price;
+
+    document.getElementById("editProductForm").action =
+        `/admin/product/update/${id}`;
+
+    document.getElementById("editProductModal").classList.remove("hidden");
+}
+
+
+function closeEditProduct() {
+    editingProductId = null;
+    document.getElementById("editProductModal").classList.add("hidden");
+}
+function saveProduct() {
+    const form = document.getElementById("editProductForm");
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+        method: "POST",
+        body: formData
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Update failed");
+        return res.json();
+    })
+    .then(() => {
+        updateProductRow();
+        closeEditProduct();
+    })
+    .catch(err => {
+        alert("Failed to update product");
+        console.error(err);
+    });
+}
+function updateProductRow() {
+    const row = document.getElementById(`product-row-${editingProductId}`);
+    if (!row) return;
+
+    const name = document.getElementById("editProductName").value;
+    const price = document.getElementById("editProductPrice").value;
+
+    row.children[1].innerText = name;
+    row.children[2].innerText = price;
+}
+
+
+
+</script>
+<!-- EDIT PRODUCT MODAL -->
+<div id="editProductModal" class="modal hidden">
+    <div class="modal-box">
+        <h3>Edit Product</h3>
+
+      <form id="editProductForm">
+    <label>Product Name</label><br>
+    <input type="text" name="name" id="editProductName" required>
+
+    <br><br>
+
+    <label>Price</label><br>
+    <input type="number" name="price" id="editProductPrice" required>
+
+    <br><br>
+
+  <button type="button" onclick="saveProduct()">Save</button>
+
+    <button type="button" onclick="closeEditProduct()">Cancel</button>
+</form>
+
+    </div>
+</div>
+
+
 
 </body>
 </html>
