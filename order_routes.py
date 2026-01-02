@@ -91,3 +91,27 @@ def invoice(order_id):
         return "Invoice not available", 403
 
     return render_template("invoice.html", order=order)
+
+
+
+@order_bp.route("/api/order/update/<order_id>", methods=["POST"])
+def update_order(order_id):
+    data = request.json
+    items = data.get("items", [])
+
+    # If user removed all items → delete order
+    if not items:
+        orders.delete_one({
+            "_id": ObjectId(order_id),
+            "status": "PLACED"
+        })
+        return jsonify({"message": "Order deleted"})
+
+    # Update items only if order is PLACED
+    orders.update_one(
+        {"_id": ObjectId(order_id), "status": "PLACED"},
+        {"$set": {"items": items}}
+    )
+
+    return jsonify({"message": "Order updated"})
+
