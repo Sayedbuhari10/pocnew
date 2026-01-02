@@ -1,6 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 from bson.objectid import ObjectId
-from werkzeug
+from werkzeug.security import generate_password_hash, check_password_hash
+from db import customers, products, customer_prices
+
+# ✅ DEFINE BLUEPRINT FIRST
+client_bp = Blueprint("client", __name__)
+
 @client_bp.route("/login")
 def login_page():
     return render_template("login.html")
@@ -61,3 +66,4 @@ def shop(customer_id):
         })
 
     return jsonify(product_list)
+
