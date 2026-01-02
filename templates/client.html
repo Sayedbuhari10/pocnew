@@ -237,6 +237,209 @@
             padding: 60px;
             color: #9ca3af;
         }
+        .modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-box {
+    background: white;
+    padding: 20px;
+    width: 400px;
+    border-radius: 6px;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ===== CART UI ===== */
+.cart h3 {
+    color: #1e40af;
+    margin-bottom: 15px;
+}
+
+.cart-item {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-item-name {
+    font-weight: 600;
+    color: #1e40af;
+}
+
+.cart-item-meta {
+    font-size: 0.85em;
+    color: #6b7280;
+}
+
+.cart-item-price {
+    font-weight: 700;
+    color: #16a34a;
+}
+
+.remove-btn {
+    background: #dc2626;
+    padding: 4px 8px;
+    font-size: 0.8em;
+}
+
+.cart-total {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 700;
+    text-align: right;
+    margin-top: 15px;
+    color: #1e40af;
+}
+/* ===== QTY BUTTONS ===== */
+.qty-btn {
+    background: #e5e7eb;
+    color: #111827;
+    border: none;
+    padding: 3px 8px;
+    margin: 0 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.qty-btn:hover {
+    background: #d1d5db;
+}
+
+.qty {
+    min-width: 20px;
+    display: inline-block;
+    text-align: center;
+    font-weight: 600;
+}
+
+.remove-btn {
+    background: #dc2626;
+    padding: 4px 10px;
+    font-size: 0.8em;
+    margin-top: 6px;
+}
+/* ===== CART ANIMATION ===== */
+.cart-item.animate {
+    animation: fadeSlide 0.25s ease-in-out;
+}
+
+@keyframes fadeSlide {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Quantity input styling */
+.qty-input {
+    width: 45px;
+    padding: 3px;
+    text-align: center;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-weight: 600;
+    margin: 0 4px;
+}
+/* ================= EDIT ORDER MODAL ================= */
+
+#editModal {
+    z-index: 999;
+}
+
+#editModal .modal-box {
+    width: 420px;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    animation: scaleIn 0.25s ease;
+}
+
+#editModal h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #1e40af;
+    font-size: 1.3em;
+    text-align: center;
+}
+
+#editContent > div {
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#editContent input[type="number"] {
+    width: 60px;
+    padding: 5px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    text-align: center;
+    font-weight: 600;
+}
+
+#editContent button {
+    background: #dc2626;
+    font-size: 0.8em;
+    padding: 5px 10px;
+    margin-left: 8px;
+}
+
+#editContent p {
+    text-align: center;
+    color: #dc2626;
+    font-weight: 600;
+}
+
+/* ACTION BUTTONS */
+#editModal .modal-box > button {
+    width: 48%;
+    margin-top: 15px;
+}
+
+#editModal .modal-box > button:first-of-type {
+    background: #16a34a;
+}
+
+#editModal .modal-box > button:last-of-type {
+    background: #64748b;
+}
+
+/* MODAL ANIMATION */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
     </style>
 </head>
 
@@ -278,10 +481,10 @@
     </div>
 
     <!-- ================= CART ================= -->
-    <div class="cart">
+    <div class="cart" id="cartSection">
         <h3>🛒 Cart</h3>
         <div id="cartItems">Cart is empty</div>
-        <button onclick="placeOrder()" style="width:100%; margin-top:15px;">
+        <button id="placeOrderBtn" onclick="placeOrder()" style="width:100%; margin-top:15px;">
             Place Order
         </button>
     </div>
@@ -294,8 +497,23 @@ let cart = [];
 
 /* NAV */
 function show(id) {
-    document.querySelectorAll('.content').forEach(d => d.classList.add("hidden"));
+
+    // Hide all main content sections
+    document.querySelectorAll('.content').forEach(d =>
+        d.classList.add("hidden")
+    );
+
+    // Show selected section
     document.getElementById(id).classList.remove("hidden");
+
+    const cart = document.getElementById("cartSection");
+
+    // ❌ Hide cart only for Notifications
+    if (id === "notify") {
+        cart.style.display = "none";
+    } else {
+        cart.style.display = "block";
+    }
 }
 
 /* SHOP */
@@ -325,29 +543,146 @@ function loadShop() {
 
 function addToCart(p) {
     let item = cart.find(i => i.id === p.id);
-    if (item) item.quantity++;
-    else cart.push({ ...p, quantity: 1 });
+
+    if (item) {
+        item.quantity++;
+        item.subtotal = item.quantity * item.price;
+    } else {
+        cart.push({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            quantity: 1,
+            subtotal: p.price
+        });
+    }
+
+    renderCart();
+}
+/* REMOVE FROM CART */
+function removeFromCart(id) {
+    cart = cart.filter(i => i.id !== id);
     renderCart();
 }
 
+
+
 function renderCart() {
     const div = document.getElementById("cartItems");
-    if (!cart.length) {
+    const btn = document.getElementById("placeOrderBtn");
+    div.innerHTML = "";
+
+    if (cart.length === 0) {
         div.innerHTML = "Cart is empty";
+        btn.disabled = true;
+        btn.style.opacity = "0.6";
         return;
     }
-    div.innerHTML = "";
-    cart.forEach(i => {
-        div.innerHTML += `<p>${i.name} × ${i.quantity}</p>`;
+
+    let total = 0;
+    btn.disabled = false;
+    btn.style.opacity = "1";
+
+    cart.forEach(item => {
+        total += item.subtotal;
+
+        div.innerHTML += `
+    <div class="cart-item animate">
+        <div>
+            <div class="cart-item-name">${item.name}</div>
+
+            <div class="cart-item-meta">
+                ₹${item.price} × 
+                <button class="qty-btn" onclick="decreaseQty('${item.id}')">➖</button>
+
+                <input type="number"
+                       min="1"
+                       class="qty-input"
+                       value="${item.quantity}"
+                       onchange="setQty('${item.id}', this.value)">
+
+                <button class="qty-btn" onclick="increaseQty('${item.id}')">➕</button>
+            </div>
+        </div>
+
+        <div style="text-align:right;">
+            <div class="cart-item-price">₹${item.subtotal}</div>
+            <button class="remove-btn" onclick="removeFromCart('${item.id}')">
+                Remove
+            </button>
+        </div>
+    </div>
+`;
+
+
     });
+
+    div.innerHTML += `
+        <div class="cart-total animate">
+            Total: ₹${total}
+        </div>
+    `;
 }
+
+/* SET QTY */
+function increaseQty(id) {
+    const item = cart.find(i => i.id === id);
+    if (!item) return;
+
+    item.quantity++;
+    item.subtotal = item.quantity * item.price;
+    renderCart();
+}
+
+function decreaseQty(id) {
+    const item = cart.find(i => i.id === id);
+    if (!item) return;
+
+    item.quantity--;
+
+    if (item.quantity <= 0) {
+        removeFromCart(id);
+        return;
+    }
+
+    item.subtotal = item.quantity * item.price;
+    renderCart();
+}
+/* SET QTY DIRECTLY */
+function setQty(id, value) {
+    const item = cart.find(i => i.id === id);
+    if (!item) return;
+
+    value = parseInt(value);
+
+    if (isNaN(value) || value <= 0) {
+        removeFromCart(id);
+        return;
+    }
+
+    item.quantity = value;
+    item.subtotal = item.quantity * item.price;
+    renderCart();
+}
+
+
+
 
 /* PLACE ORDER */
 function placeOrder() {
+
+    if (cart.length === 0) {
+        alert("Your cart is empty");
+        return;
+    }
+
     fetch("/api/order/place", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ customer_id: customerId, items: cart })
+        body: JSON.stringify({
+            customer_id: customerId,
+            items: cart
+        })
     }).then(() => {
         cart = [];
         renderCart();
@@ -370,22 +705,33 @@ function loadOrders(type) {
 
             data.forEach(o => {
                 let itemsHtml = "";
+                o.items.forEach(i => {
+    
+});
+
               
 
                 let actions = "";
                 if (o.status === "PLACED") {
-                    actions = `<button class="delete-btn" onclick="deleteOrder('${o.id}')">Cancel</button>
-                    <button class="edit-btn" >Edit</button>`;
-                }
+    actions = `
+        <button class="delete-btn" onclick="deleteOrder('${o.id}')">Cancel</button>
+        <button class="edit-btn" onclick="editOrder('${o.id}')">Edit</button>
+    `;
+}
                 if (o.status === "DELIVERED") {
                     actions += `<a class="invoice-btn" href="/invoice/${o.id}" target="_blank">Invoice</a>`;
                 }
                 if (o.status === "ACCEPTED") {
                     actions += `<p class="arrival-date"  >Arrival Date: ${o.arrival_date}</p>`;
                 }
-                if (o.status === "COMPLETED") {
-                    actions = `<button class="view-detail-btn" >View Details</button>`;
-                }
+             if (o.status === "COMPLETED") {
+    actions = `
+        <button class="view-detail-btn"
+                onclick="viewOrderDetails('${o.id}')">
+            View Details
+        </button>
+    `;
+}
 
                 div.innerHTML += `
                     <div class="order-card">
@@ -412,6 +758,113 @@ function deleteOrder(orderId) {
 
 loadShop();
 </script>
+<script>
+
+    /* code for edit and view details button*/
+    function viewOrderDetails(orderId) {
+    fetch(`/api/orders/${customerId}/completed`)
+        .then(res => res.json())
+        .then(orders => {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            let html = `<p><b>Order ${order.order_no}</b></p><ul>`;
+            order.items.forEach(i => {
+                html += `<li>${i.name} × ${i.quantity}</li>`;
+            });
+            html += "</ul>";
+
+            document.getElementById("detailsContent").innerHTML = html;
+            document.getElementById("detailsModal").classList.remove("hidden");
+        });
+}
+
+function closeDetails() {
+    document.getElementById("detailsModal").classList.add("hidden");
+}
+//edit
+let editingOrderId = null;
+let editingItems = [];
+
+function editOrder(orderId) {
+    fetch(`/api/orders/${customerId}/active`)
+        .then(res => res.json())
+        .then(orders => {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            editingOrderId = orderId;
+            editingItems = JSON.parse(JSON.stringify(order.items));
+
+            renderEditItems();
+            document.getElementById("editModal").classList.remove("hidden");
+        });
+}
+
+function renderEditItems() {
+    const div = document.getElementById("editContent");
+    div.innerHTML = "";
+
+    editingItems.forEach((item, index) => {
+        div.innerHTML += `
+          <div>
+            ${item.name}
+            <input type="number" min="1" value="${item.quantity}"
+                   onchange="updateQty(${index}, this.value)">
+            <button onclick="removeItem(${index})">Remove</button>
+          </div>
+        `;
+    });
+
+    if (editingItems.length === 0) {
+        div.innerHTML = "<p>No products left. Saving will delete the order.</p>";
+    }
+}
+
+function updateQty(index, value) {
+    editingItems[index].quantity = parseInt(value);
+}
+
+function removeItem(index) {
+    editingItems.splice(index, 1);
+    renderEditItems();
+}
+
+function saveOrderEdit() {
+    fetch(`/api/order/update/${editingOrderId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: editingItems })
+    })
+    .then(() => {
+        closeEdit();
+        loadOrders("active");
+    });
+}
+
+function closeEdit() {
+    editingOrderId = null;
+    editingItems = [];
+    document.getElementById("editModal").classList.add("hidden");
+}
+
+</script>
+<div id="detailsModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>Order Details</h3>
+    <div id="detailsContent"></div>
+    <button onclick="closeDetails()">Close</button>
+  </div>
+</div>
+<div id="editModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>Edit Order</h3>
+    <div id="editContent"></div>
+    <button onclick="saveOrderEdit()">Save</button>
+    <button onclick="closeEdit()">Cancel</button>
+  </div>
+</div>
+
 
 </body>
 </html>
