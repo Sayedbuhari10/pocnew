@@ -1,34 +1,119 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Panel</title>
+    <title>Admin Home</title>
     <style>
-        body { margin:0; font-family: Arial; background:#f4f6f8; }
-        header { background:#1e293b; color:white; padding:15px; }
-        nav span { margin-right:20px; cursor:pointer; }
-        .container { padding:20px; }
-        .hidden { display:none; }
-        table { width:100%; background:white; border-collapse: collapse; }
-        th, td { padding:10px; border-bottom:1px solid #ddd; }
-        button { padding:5px 10px; }
-        .modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
+/* ================= RESET ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ================= BODY ================= */
+body {
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    background: linear-gradient(135deg, #e0f2fe, #f8fafc);
+    color: #0f172a;
+    min-height: 100vh;
+}
+
+/* ================= HEADER ================= */
+header {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: white;
+    padding: 18px 30px;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
 }
 
-.modal-box {
+header strong {
+    font-size: 22px;
+    letter-spacing: 0.5px;
+}
+
+/* ================= NAV ================= */
+nav {
+    display: flex;
+    gap: 25px;
+}
+
+nav a {
+    color: #e5e7eb;
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 5px;
+    transition: all 0.3s ease;
+}
+
+nav a:hover {
+    color: #38bdf8;
+}
+
+/* underline animation */
+nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0%;
+    height: 2px;
+    background: #38bdf8;
+    transition: width 0.3s ease;
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+/* ================= CONTAINER ================= */
+.container {
+    padding: 40px;
+}
+
+/* ================= CARD ================= */
+.container h2 {
+    font-size: 30px;
+    margin-bottom: 12px;
+}
+
+.container p {
+    font-size: 16px;
+    color: #475569;
+}
+
+/* dashboard card */
+.dashboard-card {
+    margin-top: 30px;
     background: white;
-    padding: 20px;
-    width: 300px;
-    border-radius: 6px;
+    border-radius: 14px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+    border-left: 6px solid #0284c7;
 }
 
-.hidden {
-    display: none;
+/* ================= BADGES ================= */
+.badge {
+    display: inline-block;
+    background: #0284c7;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 12px;
+}
+
+/* ================= FOOTER ================= */
+footer {
+    margin-top: 50px;
+    text-align: center;
+    padding: 20px;
+    color: #64748b;
+    font-size: 14px;
 }
 
     </style>
@@ -36,199 +121,31 @@
 <body>
 
 <header>
-    Admin Panel
+    <strong>Admin Panel</strong>
     <nav>
-        <span onclick="show('home')">Home</span>
-        <span onclick="show('products')">Products</span>
-        <span onclick="show('customers')">Customers</span>
-        <span onclick="show('orders')">Orders</span>
+        <a href="/admin">Home</a>
+        <a href="/admin/products">Products</a>
+        <a href="/admin/customers">Customers</a>
+        <a href="/admin/orders">Orders</a>
     </nav>
 </header>
 
 <div class="container">
-
-<!-- HOME -->
-<div id="home">
     <h2>Admin Home</h2>
-    <p>Welcome Admin</p>
+    <p>Welcome to the Admin Dashboard.</p>
 </div>
-
-<!-- PRODUCTS -->
-<!-- PRODUCTS -->
-<div id="products" class="hidden">
-    <h2>Products</h2>
-
-    <!-- ADD PRODUCT -->
-    <form action="/admin/product/create" method="post">
-        <input name="name" placeholder="Product name" required>
-        <input name="price" placeholder="Price" required>
-        <button>Add Product</button>
-    </form>
-
-    <!-- DELETE SELECTED -->
-    <form action="/admin/product/delete-multiple" method="post">
-        <button type="submit" style="margin:10px 0; background:#dc2626; color:white;">
-            Delete Selected Products
-        </button>
-
-        <table>
-            <tr>
-                <th>Select</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Edit</th>
-            </tr>
-
-            {% for p in products %}
-            <tr id="product-row-{{ p._id }}">
-
-                <td>
-                    <input type="checkbox" name="product_ids" value="{{ p._id }}">
-                </td>
-                <td>{{ p.name }}</td>
-                <td>{{ p.base_price }}</td>
-                <td>
-                  <button type="button"
-        onclick="openEditProduct('{{ p._id }}','{{ p.name }}','{{ p.base_price }}')">
-    Edit
-</button>
-
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    </form>
+<!-- <div class="dashboard-card">
+    <h3>Fresh Seafood & Meat Management</h3>
+    <p>
+        Manage products, customer orders, and daily fresh stock efficiently.
+        Ensure hygiene, pricing accuracy, and fast delivery.
+    </p>
+    <span class="badge">Ocean Fresh</span>
+    <span class="badge">Daily Stock</span>
 </div>
-
-
-<!-- CUSTOMERS -->
-<div id="customers" class="hidden">
-    <h2>Customers</h2>
-
-    <form action="/admin/customer/create" method="post">
-        <input name="name" placeholder="Name" required>
-        <input name="email" placeholder="Email" required>
-        <input name="password" placeholder="Password" required>
-        <button>Add Customer</button>
-    </form>
-
-    <table>
-        <tr><th>Name</th><th>Email</th><th>Action</th></tr>
-        {% for c in customers %}
-        <tr>
-            <td>{{ c.name }}</td>
-            <td>{{ c.email }}</td>
-            <td>
-                <a href="/admin/customer/edit/{{ c._id }}">Edit</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
-
-<!-- ORDERS -->
-<div id="orders" class="hidden">
-    <h2>Orders</h2>
-    <p>Order management will be added here.</p>
-</div>
-
-</div>
-
-<script>
-function show(id) {
-    localStorage.setItem("admin_active_section", id);
-
-    document.querySelectorAll(".container > div")
-        .forEach(d => d.classList.add("hidden"));
-
-    document.getElementById(id).classList.remove("hidden");
-}
-window.onload = function () {
-    const section = localStorage.getItem("admin_active_section") || "home";
-    show(section);
-};
-
-</script>
-<script>
-    let editingProductId = null;
-
-function openEditProduct(id, name, price) {
-    editingProductId = id;
-
-    document.getElementById("editProductName").value = name;
-    document.getElementById("editProductPrice").value = price;
-
-    document.getElementById("editProductForm").action =
-        `/admin/product/update/${id}`;
-
-    document.getElementById("editProductModal").classList.remove("hidden");
-}
-
-
-function closeEditProduct() {
-    editingProductId = null;
-    document.getElementById("editProductModal").classList.add("hidden");
-}
-function saveProduct() {
-    const form = document.getElementById("editProductForm");
-    const formData = new FormData(form);
-
-    fetch(form.action, {
-        method: "POST",
-        body: formData
-    })
-    .then(res => {
-        if (!res.ok) throw new Error("Update failed");
-        return res.json();
-    })
-    .then(() => {
-        updateProductRow();
-        closeEditProduct();
-    })
-    .catch(err => {
-        alert("Failed to update product");
-        console.error(err);
-    });
-}
-function updateProductRow() {
-    const row = document.getElementById(`product-row-${editingProductId}`);
-    if (!row) return;
-
-    const name = document.getElementById("editProductName").value;
-    const price = document.getElementById("editProductPrice").value;
-
-    row.children[1].innerText = name;
-    row.children[2].innerText = price;
-}
-
-
-
-</script>
-<!-- EDIT PRODUCT MODAL -->
-<div id="editProductModal" class="modal hidden">
-    <div class="modal-box">
-        <h3>Edit Product</h3>
-
-      <form id="editProductForm">
-    <label>Product Name</label><br>
-    <input type="text" name="name" id="editProductName" required>
-
-    <br><br>
-
-    <label>Price</label><br>
-    <input type="number" name="price" id="editProductPrice" required>
-
-    <br><br>
-
-  <button type="button" onclick="saveProduct()">Save</button>
-
-    <button type="button" onclick="closeEditProduct()">Cancel</button>
-</form>
-
-    </div>
-</div>
-
-
+<footer> -->
+    <!-- &copy; 2024 Ocean Fresh Admin Panel. All rights reserved.
+</footer> -->
 
 </body>
 </html>
