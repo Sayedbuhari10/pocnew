@@ -6,31 +6,63 @@ from client_routes import client_bp
 from order_routes import order_bp
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 import os
+from admin_order import admin_order_bp
+
+
+
 
 app = Flask(__name__)
+app.register_blueprint(admin_order_bp)
 
 app.register_blueprint(client_bp)
 app.register_blueprint(order_bp)
 # -----------------------------
 # REGISTER CLIENT BLUEPRINT
 # -----------------------------
-@app.route("/admin/home")
+@app.route("/admin")
 def admin_home():
-    return render_template("admin_home.html")
+    return render_template("admin.html")
 
 
 # -----------------------------
 # ADMIN DASHBOARD
 # -----------------------------
-@app.route("/admin")
-def admin_dashboard():
+# -----------------------------
+# ADMIN HOME
+# -----------------------------
+
+
+# -----------------------------
+# ADMIN PRODUCTS
+# -----------------------------
+@app.route("/admin/products")
+def admin_products():
     all_products = list(products.find())
+    return render_template(
+        "admin_products.html",
+        products=all_products
+    )
+
+
+# -----------------------------
+# ADMIN CUSTOMERS
+# -----------------------------
+@app.route("/admin/customers")
+def admin_customers():
     all_customers = list(customers.find())
     return render_template(
-        "admin.html",
-        products=all_products,
+        "admin_customers.html",
         customers=all_customers
     )
+
+
+# -----------------------------
+# ADMIN ORDERS
+# -----------------------------
+@app.route("/admin/orders")
+def admin_orders():
+    return render_template("admin_orders.html")
+
 
 # -----------------------------
 # CREATE PRODUCT
@@ -41,7 +73,8 @@ def create_product():
         "name": request.form["name"],
         "base_price": float(request.form["price"])
     })
-    return redirect(url_for("admin_dashboard"))
+    return redirect(url_for("admin_products"))
+
 
 # -----------------------------
 # UPDATE PRODUCT
@@ -67,7 +100,7 @@ def delete_multiple_products():
         products.delete_one({"_id": ObjectId(pid)})
         customer_prices.delete_many({"product_id": pid})
 
-    return redirect(url_for("admin_dashboard"))
+    return redirect(url_for("admin_products"))
 
 
 # -----------------------------
@@ -80,7 +113,8 @@ def create_customer():
         "email": request.form["email"],
         "password": generate_password_hash(request.form["password"])
     })
-    return redirect(url_for("admin_dashboard"))
+    return redirect(url_for("admin_customers"))
+
 
 # -----------------------------
 # SET CUSTOMER-SPECIFIC PRICE
@@ -95,7 +129,8 @@ def set_customer_price():
         {"$set": {"price": float(request.form["price"])}},
         upsert=True
     )
-    return redirect(url_for("admin_dashboard"))
+    return redirect(url_for("admin_customers"))
+
 
 
 
@@ -103,6 +138,17 @@ def set_customer_price():
 def edit_customer_page(id):
     return render_template("edit_customer.html")
 
+
+@app.route("/admin/customer/delete-multiple", methods=["POST"])
+def delete_multiple_customers():
+    ids = request.json.get("customer_ids", [])
+
+    for cid in ids:
+        customers.delete_one({"_id": ObjectId(cid)})
+        customer_prices.delete_many({"customer_id": cid})
+        orders.delete_many({"customer_id": cid})
+
+    return jsonify({"message": "Customers deleted"})
 
 # -----------------------------
 # APP ENTRY POINT

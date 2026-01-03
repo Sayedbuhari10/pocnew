@@ -66,4 +66,3 @@ def shop(customer_id):
         })
 
     return jsonify(product_list)
-
