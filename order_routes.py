@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify, render_template
 from bson.objectid import ObjectId
 from datetime import datetime
 from db import orders, invoices
+from notification_service import create_notification, delete_notification
+
 
 
 order_bp = Blueprint("orders", __name__)
@@ -19,7 +21,7 @@ def get_next_order_no(customer_id):
 
 # -----------------------------
 # PLACE ORDER
-# -----------------------------
+# ----------------------------------------------------------------------------------------------------------
 from datetime import datetime
 
 @order_bp.route("/api/order/place", methods=["POST"])
@@ -32,7 +34,7 @@ def place_order():
     
     order_no = get_next_order_no(customer_id)
 
-    orders.insert_one({
+    r=orders.insert_one({
         "order_no": order_no,
         "customer_id": customer_id,
 
@@ -49,13 +51,15 @@ def place_order():
         "invoice_sent": False,
         "invoice_id": None
     })
+    create_notification(r.inserted_id, "PLACED", "ADMIN",0)
+    
 
     return jsonify({"message": "Order placed"})
 
 
 # -----------------------------
-# GET ORDERS (ACTIVE / COMPLETED)
-# -----------------------------
+# GET ORDERS placed
+# ---------------------------------------------------------------------------------------------------------
 
 
 @order_bp.route("/api/orders/<customer_id>/<order_type>")
@@ -93,11 +97,37 @@ def delete_order(order_id):
         "_id": ObjectId(order_id),
         "status": "PLACED"
     })
+    delete_notification(order_id,"PLACED")
     return jsonify({"message": "Order deleted"})
 
 
+
+ # order update---------
+@order_bp.route("/api/order/update/<order_id>", methods=["POST"])
+def update_order(order_id):
+    data = request.json
+    items = data.get("items", [])
+
+    # If user removed all items → delete order
+    if not items:
+        orders.delete_one({
+            "_id": ObjectId(order_id),
+            "status": "PLACED"
+        })
+        return jsonify({"message": "Order deleted"})
+
+    # Update items only if order is PLACED
+    orders.update_one(
+        {"_id": ObjectId(order_id), "status": "PLACED"},
+        {"$set": {"items": items}}
+    )
+
+    return jsonify({"message": "Order updated"})
+
+
+
 # -----------------------------
-# INVOICE VIEW
+# INVOICE VIEW deleverd
 # -----------------------------
 #@order_bp.route("/invoice/<order_id>")
 
@@ -124,31 +154,11 @@ def invoice_page(order_id):
     )
 
 
-@order_bp.route("/api/order/update/<order_id>", methods=["POST"])
-def update_order(order_id):
-    data = request.json
-    items = data.get("items", [])
-
-    # If user removed all items → delete order
-    if not items:
-        orders.delete_one({
-            "_id": ObjectId(order_id),
-            "status": "PLACED"
-        })
-        return jsonify({"message": "Order deleted"})
-
-    # Update items only if order is PLACED
-    orders.update_one(
-        {"_id": ObjectId(order_id), "status": "PLACED"},
-        {"$set": {"items": items}}
-    )
-
-    return jsonify({"message": "Order updated"})
-
 
 
 @order_bp.route("/api/invoice/pay/<invoice_id>", methods=["POST"])
 def pay_invoice(invoice_id):
+    invoice = invoices.find_one({"_id": ObjectId(invoice_id)})
     invoices.update_one(
         {"_id": ObjectId(invoice_id)},
         {
@@ -168,5 +178,6 @@ def pay_invoice(invoice_id):
             }
         }
     )
+    create_notification(invoice["order_id"],"COMPLETED","ADMIN",0)
 
     return jsonify({"message": "Invoice paid"})
