@@ -64,10 +64,13 @@ def shop(customer_id):
         price = price_doc["price"] if price_doc else p["base_price"]
 
         product_list.append({
-            "id": str(p["_id"]),
-            "name": p["name"],
-            "price": price
-        })
+    "id": str(p["_id"]),
+    "name": p["name"],
+    "price": price,
+    "image": f"/static/{p['img']}" if p.get("img") else "/static/default.jpg"
+})
+
+
 
     return jsonify(product_list)
 

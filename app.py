@@ -48,11 +48,13 @@ def admin_products():
 @app.route("/admin/product/create", methods=["POST"])
 def create_product():
     name = request.form["name"].strip()
-
+    safe_name = name.lower().replace(" ", "_")
     products.insert_one({
         "name": name,
         "base_price": float(request.form["price"]),
-        "img": f"{name}.jpg"
+        
+        "img": f"{safe_name}.jpg"
+
     })
 
     return redirect(url_for("admin_products"))

@@ -18,8 +18,8 @@
 
         nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 60px; position: fixed; top: 0; width: 100%; z-index: 1000;
-            background: rgba(7,89,133,0.3); backdrop-filter: blur(10px); transition: all 0.3s ease;
+            padding: 14px 56px; position: fixed; top: 0; width: 100%; z-index: 1000;
+            background: rgba(7,89,133,0.3); backdrop-filter: blur(10px); transition: all 0.3s ease; backdrop-filter: blur(14px);
         }
         nav.scrolled { background: rgba(7,89,133,0.95); padding: 15px 60px; }
 
@@ -125,7 +125,7 @@
         }
         .scroll-indicator::before { content: '↓'; font-size: 2em; color: white; }
 
-        .main-content { min-height: 100vh; background: #f4f6f8; }
+        .main-content { min-height: 100vh;     background: linear-gradient( 180deg, #e0f2fe, #cfeff5, #b6e3ec  ); }
         .container { display: flex; min-height: calc(100vh - 90px); }
         .content { flex: 3; padding: 25px; }
         .cart { flex: 1; background: #f8f9fa; padding: 25px; border-left: 1px solid #ddd; }
@@ -606,12 +606,14 @@
 @media (max-width: 1024px) {
     .products-grid {
         grid-template-columns: repeat(2, 1fr); /* tablets */
+        padding-bottom: 40px;
     }
 }
 
 @media (max-width: 640px) {
     .products-grid {
         grid-template-columns: 1fr; /* mobile */
+        padding-bottom: 40px;
     }
 }
 
@@ -677,7 +679,199 @@
 
 
 #orders {
-    margin-top: 100px;
+    margin-top: 120px;
+}
+
+/* .orders-container {
+    padding-left: 24px;
+    padding-right: 24px;
+} */
+
+.orders-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+
+.container {
+    max-width: 1200px;     /* center content */
+    margin: 0 auto;
+    padding: 0 24px;      /* 👈 LEFT & RIGHT SPACE */
+}
+
+.content {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    border-radius: 22px;
+    box-shadow: 0 20px 45px rgba(7, 89, 133, 0.15);
+}
+
+#notificationDrawer .cart-header {
+    background: linear-gradient(135deg, #0e7490, #38bdf8);
+}
+
+.hero-title {
+    margin-bottom: 10px; /* reduce gap */
+}
+
+.hero-subtitle {
+    margin-bottom: 22px; /* tighter spacing */
+}
+
+.hero-description {
+    margin-top: 8px;
+    line-height: 1.75;
+}
+
+
+.cta-button {
+    padding: 18px 46px;
+    background: linear-gradient(135deg, #22d3ee, #0ea5e9);
+    box-shadow:
+        0 12px 30px rgba(14,165,233,0.45),
+        inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.cta-button:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 45px rgba(14,165,233,0.6);
+}
+
+.nav-arrow {
+    width: 52px;
+    height: 52px;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.35);
+}
+
+.nav-arrow.left { left: 36px; }
+.nav-arrow.right { right: 36px; }
+
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        circle at 30% 40%,
+        rgba(255,255,255,0.08),
+        transparent 60%
+    );
+    pointer-events: none;
+}
+
+.nav-icons {
+    align-items: center;
+    margin-top: 2px;
+}
+
+.product-image-wrapper {
+    width: 100%;
+    aspect-ratio: 3 / 2;      /* ✅ matches 600×399 */
+    background: #f8fafc;
+    overflow: hidden;
+}
+
+.product-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;        /* clean crop, no stretch */
+    display: block;
+}
+
+
+/* ================= TRUCK CHECKOUT ANIMATION ================= */
+
+.truck-button {
+    position: relative;
+    width: 100%;
+    height: 52px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    background: linear-gradient(135deg, #075985, #0ea5e9, #06b6d4);
+    color: white;
+    font-weight: 800;
+    font-size: 1em;
+    box-shadow: 0 12px 28px rgba(14,165,233,0.45);
+}
+
+.truck-button span {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+}
+
+.truck-button .success {
+    opacity: 0;
+}
+
+.truck-button.active .default {
+    opacity: 0;
+}
+
+.truck-button.active .success {
+    opacity: 1;
+}
+
+/* Truck */
+.truck {
+    position: absolute;
+    left: -120px;
+    bottom: 6px;
+    width: 110px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.truck .back {
+    width: 60px;
+    height: 26px;
+    background: #e0f2fe;
+    border-radius: 4px;
+}
+
+.truck .front {
+    width: 28px;
+    height: 22px;
+    background: #bae6fd;
+    margin-left: 4px;
+    border-radius: 4px;
+}
+
+.truck .box {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: #38bdf8;
+    top: -6px;
+    left: 20px;
+    border-radius: 2px;
+}
+
+.truck .wheel {
+    width: 10px;
+    height: 10px;
+    background: #0f172a;
+    border-radius: 50%;
+    position: absolute;
+    bottom: -4px;
+    left: 12px;
+}
+
+/* Animation */
+.truck-button.active .truck {
+    animation: drive 2s ease forwards;
+}
+
+@keyframes drive {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(520px); }
 }
 
 
@@ -736,7 +930,7 @@
                 <div id="products" class="products-grid"></div>
             </div>
 
-            <div class="content hidden" id="orders">
+            <div class="content hidden"  id="orders">
                 <div class="orders-header">
                     <h2>📦 My Orders</h2>
                     <div>
@@ -744,7 +938,11 @@
                         <button onclick="loadOrders('completed')">Completed</button>
                     </div>
                 </div>
-                <div id="orderList"></div>
+                <div class="orders-container">
+                    <div id="orderList">
+                        <!-- order cards -->
+                    </div>
+                </div>
             </div>
 
             <div class="cart" id="cartSection">
@@ -803,8 +1001,16 @@
                 <span id="cartTotal">₹0</span>
             </div>
 
-            <button class="checkout-btn" onclick="checkoutFromDrawer()">
-                Proceed to Checkout
+            <button class="truck-button" onclick="animateCheckout(this)">
+                <span class="default">Proceed to Checkout</span>
+                <span class="success">Order Placed</span>
+
+                <div class="truck">
+                    <div class="wheel"></div>
+                    <div class="back"></div>
+                    <div class="front"></div>
+                    <div class="box"></div>
+                </div>
             </button>
 
         </div>
@@ -910,7 +1116,20 @@ function scrollToShop() {
                 updateActiveNav('orders');
                 loadOrders('active');
             }
+            else if (id === 'shop') {
+                document.getElementById('heroSection').style.display = 'flex';
+                document.getElementById('shop').classList.remove('hidden');
+                document.getElementById('orders').classList.add('hidden');
+                updateActiveNav('shop');
+
+                // smooth scroll to products
+                document.getElementById('shop')
+                    .scrollIntoView({ behavior: 'smooth' });
+            }
+
+
         }
+
 
 
 
@@ -926,7 +1145,7 @@ function scrollToShop() {
                             <div class="product-image-wrapper">
                                 ${
                                     p.image
-                                    ? `<img src="${p.image}" alt="${p.name}" />`
+                                    ? `<img src="${p.image}" onerror="this.src='/static/images/${p.name}.jpg'"  alt="${p.name}" />`
                                     : `<div class="image-placeholder">${p.name}</div>`
                                 }
                             </div>
@@ -1320,6 +1539,40 @@ function closeCart() {
 }
 
 
+// function renderCartDrawer() {
+//     const div = document.getElementById("cartDrawerItems");
+//     const subtotalEl = document.getElementById("cartSubtotal");
+//     const totalEl = document.getElementById("cartTotal");
+
+//     if (cart.length === 0) {
+//         div.innerHTML = "<p style='text-align:center;color:#64748b;'>Your cart is empty</p>";
+//         subtotalEl.textContent = "₹0";
+//         totalEl.textContent = "₹0";
+//         return;
+//     }
+
+//     let total = 0;
+
+//     div.innerHTML = cart.map(item => {
+//         total += item.subtotal;
+//         return `
+//             <div class="drawer-item">
+//                 <div class="drawer-item-title">${item.name}</div>
+//                 <div class="drawer-controls">
+//                     <div class="qty-control">
+//                         <button onclick="decreaseQty('${item.id}')">−</button>
+//                         <span>${item.quantity}</span>
+//                         <button onclick="increaseQty('${item.id}')">+</button>
+//                     </div>
+//                     <div class="item-price">₹${item.subtotal}</div>
+//                 </div>
+//             </div>
+//         `;
+//     }).join("");
+
+//     subtotalEl.textContent = `₹${total}`;
+//     totalEl.textContent = `₹${total}`;
+// }
 
 function renderCartDrawer() {
     const container = document.getElementById("cartDrawerItems");
@@ -1454,7 +1707,30 @@ function loadNotificationPreview() {
 
 
 function openNotifications() {
-    window.location.href = `/client/notifications/${customerId}`;
+    window.location.href = `/client/notification/${customerId}`;
+}
+
+
+function animateCheckout(btn) {
+    if (cart.length === 0) {
+        alert("Your cart is empty");
+        return;
+    }
+
+    // Start animation
+    btn.classList.add("active");
+    btn.disabled = true;
+
+    // Wait for animation → then place order
+    setTimeout(() => {
+        checkoutFromDrawer();
+
+        // Reset button after success
+        setTimeout(() => {
+            btn.classList.remove("active");
+            btn.disabled = false;
+        }, 1200);
+    }, 2000);
 }
 
 
