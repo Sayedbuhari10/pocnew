@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Home</title>
+    <style>
+/* ================= RESET ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ================= ROOT COLORS ================= */
+:root {
+    --primary-blue: #0b4db8;
+    --secondary-blue: #0f62d6;
+    --accent-orange: #f4a261;
+    --text-light: #e5ecf7;
+    --text-muted: #c7d3ea;
+    --card-bg: #ffffff;
+    --shadow-soft: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+/* ================= BODY ================= */
+body {
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    background: linear-gradient(
+        135deg,
+        #0a49b9 0%,
+        #0b57cc 40%,
+        #0d63e0 100%
+    );
+    min-height: 100vh;
+    color: var(--text-light);
+}
+
+/* ================= TOP NAV ================= */
+header {
+    height: 70px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+
+header .logo {
+    display: flex;
+    align-items: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary-blue);
+}
+
+header nav a {
+    margin-left: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    color: #334155;
+}
+
+header .btn {
+    background: var(--primary-blue);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* ================= HERO ================= */
+.hero {
+    height: calc(100vh - 70px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+}
+
+.hero-content {
+    max-width: 820px;
+}
+
+/* Headline */
+.hero h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 64px;
+    font-weight: 500;
+    line-height: 1.15;
+    color: white;
+}
+
+.hero h1 span {
+    color: var(--accent-orange);
+}
+
+/* Subtitle */
+.hero p {
+    margin-top: 20px;
+    font-size: 18px;
+    color: var(--text-muted);
+    line-height: 1.7;
+}
+
+/* CTA */
+.hero .cta {
+    margin-top: 35px;
+}
+
+.hero .cta button {
+    padding: 14px 36px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(
+        135deg,
+        #ffffff 0%,
+        #e6efff 100%
+    );
+    color: var(--primary-blue);
+    cursor: pointer;
+    box-shadow: var(--shadow-soft);
+}
+
+.hero .cta button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+}
+
+/* ================= ADMIN CARDS ================= */
+.admin-section {
+    background: #f8fafc;
+    color: #0f172a;
+    padding: 60px 40px;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+}
+
+.admin-card {
+    background: var(--card-bg);
+    padding: 28px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-soft);
+}
+
+.admin-card h3 {
+    font-size: 18px;
+    color: #1e293b;
+    margin-bottom: 10px;
+}
+
+.admin-card p {
+    font-size: 14px;
+    color: #64748b;
+}
+
+/* ================= BUTTONS ================= */
+button {
+    font-family: inherit;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 42px;
+    }
+
+    header {
+        padding: 0 20px;
+    }
+}
+
+/* ================= FLOATING NOTIFICATION ================= */
+
+/* Modern / futuristic FAB */
+#notifyFab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 64px;
+    height: 64px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: radial-gradient(circle at 30% 0%, #f97316 0%, #fb923c 20%, #0f172a 75%);
+    box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.3),
+        0 18px 40px rgba(0,0,0,0.45);
+    color: #e5e7eb;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    z-index: 1000;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.3s ease;
+}
+
+#notifyFab:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow:
+        0 0 0 1px rgba(59, 130, 246, 0.4),
+        0 24px 60px rgba(0,0,0,0.6);
+}
+
+#notifyFab-inner-icon {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    letter-spacing: 0.04em;
+}
+
+/* badge */
+.notify-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: #22c55e;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 6px;
+    border-radius: 999px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+}
+
+/* ================= PANEL ================= */
+
+.notification-panel {
+    position: fixed;
+    bottom: 90px;
+    right: 24px;
+    width: 320px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+    overflow: hidden;
+    z-index: 1000;
+    animation: slideUp 0.25s ease;
+}
+
+.hidden {
+    display: none;
+}
+
+/* header */
+.panel-header {
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.panel-header button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* body */
+.panel-body {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* item */
+.notify-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.notify-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #c7d2fe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #1e3a8a;
+}
+
+.notify-content b {
+    font-size: 14px;
+    color: #1e293b;
+}
+
+.notify-content p {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+/* footer */
+.panel-footer {
+    text-align: center;
+    padding: 12px;
+    background: #f8fafc;
+}
+
+.panel-footer a {
+    font-size: 13px;
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* animation */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== OVERRIDES FOR DARK PANEL ===== */
+.notification-panel {
+    background: #0f172a; /* DARK PANEL */
+    color: #e5e7eb;
+    border: 1px solid rgba(255,255,255,0.12);
+}
+
+/* header */
+.panel-header {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    color: white;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+/* close button */
+.panel-header button {
+    color: #cbd5f5;
+}
+
+/* body */
+.panel-body {
+    background: #020617;
+}
+
+/* notification item */
+.notify-item {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    transition: background 0.2s ease;
+}
+
+.notify-item:hover {
+    background: rgba(255,255,255,0.06);
+}
+
+/* avatar */
+.notify-avatar {
+    background: linear-gradient(135deg, #38bdf8, #2563eb);
+    color: white;
+}
+
+/* text */
+.notify-content b {
+    color: #f8fafc;
+}
+
+.notify-content p {
+    color: #94a3b8;
+}
+
+/* footer */
+.panel-footer {
+    background: #020617;
+}
+
+.panel-footer a {
+    color: #38bdf8;
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <strong>ADMIN</strong>
+    <nav>
+        <a href="/admin">Home</a>
+        <a href="/admin/products">Products</a>
+        <a href="/admin/customers">Customers</a>
+        <a href="/admin/orders">Orders</a>
+        <a href="/admin/notification" style="color:#fff;margin-right:20px;text-decoration:none;">
+            Notifications
+        </a>
+    </nav>
+</header>
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>
+            Premium Cuts,<br>
+            <span>Personalized Pricing</span>
+        </h1>
+        <p>
+            Experience the finest selection of raw meats and fresh seafood,
+            curated daily for our exclusive clients.
+        </p>
+    </div>
+</section>
+
+<!-- 🔔 Floating Notification Button -->
+<div id="notifyFab" onclick="toggleNotifications()">
+    <div id="notifyFab-inner-icon">
+        <!-- Futuristic-style icon: ring + pulse dot -->
+        &#128276;<span style="font-size:10px;">●</span>
+    </div>
+    <span id="notifyCount" class="notify-badge hidden">0</span>
+</div>
+
+<!-- 📩 Notification Panel -->
+<div id="notificationPanel" class="notification-panel hidden">
+    <div class="panel-header">
+        <span>Notifications</span>
+        <button onclick="toggleNotifications()">✕</button>
+    </div>
+
+    <div id="notificationList" class="panel-body">
+        <!-- notifications injected here -->
+    </div>
+
+    <div class="panel-footer">
+        <a href="/admin/notification">See all incoming activity</a>
+    </div>
+</div>
+
+<script>
+let panelOpen = false;
+
+function toggleNotifications() {
+    panelOpen = !panelOpen;
+    document.getElementById("notificationPanel")
+        .classList.toggle("hidden", !panelOpen);
+
+    if (panelOpen) loadNotifications();
+}
+
+/* LOAD ADMIN NOTIFICATIONS */
+function loadNotifications() {
+    fetch("/admin/api/notifications")
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById("notificationList");
+            const badge = document.getElementById("notifyCount");
+
+            list.innerHTML = "";
+
+            if (!data.length) {
+                list.innerHTML =
+                    "<p style='padding:20px;color:#64748b;'>No notifications</p>";
+                badge.classList.add("hidden");
+                return;
+            }
+
+            badge.textContent = data.length;
+            badge.classList.remove("hidden");
+
+            data.forEach(n => {
+                list.innerHTML += `
+                    <div class="notify-item">
+                        <div class="notify-avatar">
+                            ${n.customer_name.charAt(0)}
+                        </div>
+                        <div class="notify-content">
+                            <b>Order #${n.order_no}</b>
+                            <p>${n.customer_name} – ${n.state}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+}
+
+/* AUTO LOAD COUNT EVERY 30s */
+setInterval(() => {
+    if (!panelOpen) loadNotifications();
+}, 30000);
+
+loadNotifications();
+</script>
+</body>
+</html>
