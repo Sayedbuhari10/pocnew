@@ -138,14 +138,7 @@
         }
         button:hover, a.btn:hover { background: #0284c7; transform: translateY(-2px); }
 
-        /* .products-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 20px; margin-top: 20px;
-        } */
-        /* .product-card {
-            background: white; border: 2px solid #e0e0e0; border-radius: 12px;
-            padding: 20px; transition: 0.3s; 
-        }*/
+    
         .product-card:hover {
             transform: translateY(-5px); box-shadow: 0 10px 25px rgba(14,165,233,0.2);
             border-color: #0ea5e9;
@@ -186,9 +179,7 @@
             width: 45px; padding: 3px; text-align: center; border: 1px solid #d1d5db;
             border-radius: 4px; font-weight: 600; margin: 0 4px;
         }
-        /* .remove-btn { background: #dc2626; padding: 4px 10px; font-size: 0.8em; margin-top: 6px; }
-        .remove-btn:hover { background: #b91c1c; } */
-
+      
         .orders-header {
             background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 25px;
             display: flex; justify-content: space-between; align-items: center;
@@ -509,35 +500,6 @@
     transform: translateY(-4px);
 }
 
-/* Image area */
-/* .product-image-wrapper {
-    width: 100%;
-    height: 190px;
-    background: #f1f5f9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-} */
-/* .product-image-wrapper img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: cover;
-}        */
-/* Placeholder if image missing */
-/* .image-placeholder {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #e0f2fe, #f8fafc);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 16px;
-    font-weight: 700;
-    color: #075985;
-    font-size: 1.05em;
-} */
 
 /* Content padding */
 .product-info {
@@ -682,10 +644,6 @@
     margin-top: 120px;
 }
 
-/* .orders-container {
-    padding-left: 24px;
-    padding-right: 24px;
-} */
 
 .orders-container {
     max-width: 1100px;
@@ -868,6 +826,31 @@
 .truck-button.active .truck {
     animation: drive 2s ease forwards;
 }
+
+        /* ================= FISH HOME BACKGROUND ================= */
+
+#fishCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* Optional dark overlay for readability */
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(7, 89, 133, 0.45);
+    z-index: 1;
+}
+
 
 @keyframes drive {
     0% { transform: translateX(0); }
@@ -1093,7 +1076,143 @@
     </div>
 
 </div>
+    <section class="hero" id="heroSection">
+    <!-- 🐟 Fish Animation (HOME ONLY) -->
+    <canvas id="fishCanvas"></canvas>
 
+    <div class="hero-content">
+        <h1 class="hero-title">Delicious</h1>
+        <h2 class="hero-subtitle">Seafood</h2>
+        <p class="hero-description">
+            Experience the finest selection of fresh seafood, sustainably sourced
+            and delivered to your door.
+        </p>
+        <button class="cta-button" onclick="showSection('shop')">
+            Explore Products
+        </button>
+    </div>
+</section>
+
+
+<script>
+/* ================= FISH SWARM (HOME ONLY) ================= */
+
+let fishRunning = false;
+let fishRAF = null;
+
+function startFishAnimation() {
+    if (fishRunning) return;
+    fishRunning = true;
+    initFishSwarm();
+}
+
+function stopFishAnimation() {
+    fishRunning = false;
+    cancelAnimationFrame(fishRAF);
+
+    const canvas = document.getElementById("fishCanvas");
+    if (canvas) {
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
+function initFishSwarm() {
+    const canvas = document.getElementById("fishCanvas");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    let fish = [];
+    let mouse = { x: 0, y: 0 };
+
+    function resize() {
+        const hero = document.getElementById("heroSection");
+        canvas.width = hero.offsetWidth;
+        canvas.height = hero.offsetHeight;
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    canvas.addEventListener("mousemove", e => {
+        const r = canvas.getBoundingClientRect();
+        mouse.x = e.clientX - r.left;
+        mouse.y = e.clientY - r.top;
+    });
+
+    const COUNT = 120;
+
+    for (let i = 0; i < COUNT; i++) {
+        fish.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 2,
+            vy: (Math.random() - 0.5) * 2,
+            size: Math.random() * 6 + 5,
+            angle: Math.random() * Math.PI * 2,
+            speed: Math.random() * 0.6 + 0.4,
+            hue: Math.random() * 30 + 190
+        });
+    }
+
+    function drawFish(f) {
+        ctx.save();
+        ctx.translate(f.x, f.y);
+        ctx.rotate(f.angle);
+
+        ctx.beginPath();
+        ctx.ellipse(0, 0, f.size, f.size * 0.6, 0, 0, Math.PI * 2);
+        ctx.fillStyle = `hsl(${f.hue},70%,45%)`;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(-f.size, 0);
+        ctx.lineTo(-f.size * 1.6, -f.size * 0.5);
+        ctx.lineTo(-f.size * 1.6, f.size * 0.5);
+        ctx.closePath();
+        ctx.fillStyle = `hsl(${f.hue},80%,55%)`;
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    function animate() {
+        if (!fishRunning) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        fish.forEach(f => {
+            const dx = mouse.x - f.x;
+            const dy = mouse.y - f.y;
+            const dist = Math.hypot(dx, dy);
+
+            if (dist > 50) {
+                const target = Math.atan2(dy, dx);
+                f.angle += (target - f.angle) * 0.05;
+            }
+
+            f.vx += Math.cos(f.angle) * f.speed;
+            f.vy += Math.sin(f.angle) * f.speed;
+
+            f.x += f.vx;
+            f.y += f.vy;
+
+            f.vx *= 0.96;
+            f.vy *= 0.96;
+
+            if (f.x < -50) f.x = canvas.width + 50;
+            if (f.x > canvas.width + 50) f.x = -50;
+            if (f.y < -50) f.y = canvas.height + 50;
+            if (f.y > canvas.height + 50) f.y = -50;
+
+            drawFish(f);
+        });
+
+        fishRAF = requestAnimationFrame(animate);
+    }
+
+    animate();
+}
+</script>
 
 
     <script>
@@ -1104,6 +1223,7 @@
             renderCart();
             renderCartDrawer();
             loadNotificationCount();
+            startFishAnimation(); 
             document.getElementById("heroSection").style.display = 'flex';
             document.getElementById("shop").classList.remove("hidden");
             document.getElementById("orders").classList.add("hidden");
@@ -1127,16 +1247,17 @@ function scrollToTop() {
     document.getElementById('heroSection').style.display = 'flex';
     document.getElementById('shop').classList.remove('hidden');
     document.getElementById('orders').classList.add('hidden');
-    // document.getElementById('cartSection').style.display = 'block';
 
+    startFishAnimation(); // 🐟 ON
     updateActiveNav('home');
 }
 
 function scrollToShop() {
+    stopFishAnimation(); // ❌ OFF
+
     document.getElementById('heroSection').style.display = 'flex';
     document.getElementById('shop').classList.remove('hidden');
     document.getElementById('orders').classList.add('hidden');
-    // document.getElementById('cartSection').style.display = 'block';
 
     document.getElementById('shop').scrollIntoView({ behavior: 'smooth' });
     updateActiveNav('shop');
@@ -1154,31 +1275,17 @@ function scrollToShop() {
         }
 
 // Show specific section
+function showSection(id) {
+    stopFishAnimation(); // ❌ OFF
 
-        function showSection(id) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            closeCart();
-            if (id === 'orders') {
-                document.getElementById('heroSection').style.display = 'none';
-                document.getElementById('orders').classList.remove('hidden');
-                document.getElementById('shop').classList.add('hidden');
-                // document.getElementById('cartSection').style.display = 'none';
-                updateActiveNav('orders');
-                loadOrders('active');
-            }
-            else if (id === 'shop') {
-                document.getElementById('heroSection').style.display = 'flex';
-                document.getElementById('shop').classList.remove('hidden');
-                document.getElementById('orders').classList.add('hidden');
-                updateActiveNav('shop');
-
-                // smooth scroll to products
-                document.getElementById('shop')
-                    .scrollIntoView({ behavior: 'smooth' });
-            }
-
-
-        }
+    if (id === 'orders') {
+        document.getElementById('heroSection').style.display = 'none';
+        document.getElementById('orders').classList.remove('hidden');
+        document.getElementById('shop').classList.add('hidden');
+        updateActiveNav('orders');
+        loadOrders('active');
+    }
+}
 
 
 
@@ -1589,40 +1696,7 @@ function closeCart() {
 }
 
 
-// function renderCartDrawer() {
-//     const div = document.getElementById("cartDrawerItems");
-//     const subtotalEl = document.getElementById("cartSubtotal");
-//     const totalEl = document.getElementById("cartTotal");
 
-//     if (cart.length === 0) {
-//         div.innerHTML = "<p style='text-align:center;color:#64748b;'>Your cart is empty</p>";
-//         subtotalEl.textContent = "₹0";
-//         totalEl.textContent = "₹0";
-//         return;
-//     }
-
-//     let total = 0;
-
-//     div.innerHTML = cart.map(item => {
-//         total += item.subtotal;
-//         return `
-//             <div class="drawer-item">
-//                 <div class="drawer-item-title">${item.name}</div>
-//                 <div class="drawer-controls">
-//                     <div class="qty-control">
-//                         <button onclick="decreaseQty('${item.id}')">−</button>
-//                         <span>${item.quantity}</span>
-//                         <button onclick="increaseQty('${item.id}')">+</button>
-//                     </div>
-//                     <div class="item-price">₹${item.subtotal}</div>
-//                 </div>
-//             </div>
-//         `;
-//     }).join("");
-
-//     subtotalEl.textContent = `₹${total}`;
-//     totalEl.textContent = `₹${total}`;
-// }
 
 function renderCartDrawer() {
     const container = document.getElementById("cartDrawerItems");
@@ -1862,4 +1936,5 @@ function logoutClient() {
 
     </script>
 </body>
+
 </html>
