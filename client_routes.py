@@ -91,7 +91,7 @@ def get_client_notifications(customer_id):
 
     for n in notifications.find({
         "target": "CLIENT",
-        "customer_id": customer_id
+        "customer_id": ObjectId(customer_id)
     }):
         order = orders.find_one({"_id": ObjectId(n["order_id"])})
 
@@ -144,4 +144,5 @@ def get_client_completed_orders(customer_id):
         })
 
     return jsonify(result)
+
 
