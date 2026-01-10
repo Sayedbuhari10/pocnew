@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Client Notifications</title>
+
+<style>
+/* ================= RESET ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ================= BODY ================= */
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    min-height: 100vh;
+    background: radial-gradient(circle at center,
+        rgba(219,234,254,0.9) 0%,
+        rgba(254,242,242,0.9) 70%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ================= MAIN WRAPPER ================= */
+.wrapper {
+    width: 100%;
+    max-width: 520px;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+/* ================= ICON ================= */
+.bell {
+    font-size: 42px;
+    margin-bottom: 18px;
+}
+
+/* ================= NOTIFICATION LIST ================= */
+.notifications {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* ================= CARD ================= */
+.notification-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 18px 35px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: 0.25s ease;
+}
+
+.notification-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 22px 45px rgba(0,0,0,0.12);
+}
+
+/* ================= LEFT ================= */
+.left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* Avatar circle */
+.icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #eef2ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+/* Text */
+.text b {
+    display: block;
+    font-size: 15px;
+    color: #0f172a;
+}
+.text span {
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* ================= ACTION ================= */
+.action {
+    font-size: 22px;
+    color: #94a3b8;
+    cursor: pointer;
+}
+.action:hover {
+    color: #2563eb;
+}
+
+/* ================= EMPTY ================= */
+.empty {
+    margin-top: 40px;
+    color: #64748b;
+    font-size: 15px;
+}
+
+/* ================= MODAL ================= */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+.modal.hidden { display: none; }
+
+.modal-box {
+    background: white;
+    padding: 24px;
+    width: 420px;
+    border-radius: 16px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+    text-align: left;
+}
+
+.modal-box h3 {
+    margin-bottom: 12px;
+}
+
+.modal-box ul {
+    padding-left: 20px;
+    margin-bottom: 16px;
+}
+
+.modal-box button {
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ================= TOP BAR ================= */
+.top-bar {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+}
+
+.home-icon {
+    font-size: 26px;
+    cursor: pointer;
+    color: #2563eb;
+    transition: transform 0.2s ease;
+}
+
+.home-icon:hover {
+    transform: scale(1.15);
+}
+
+/* ================= FIXED HOME ICON ================= */
+.home-fixed {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    font-size: 28px;
+    cursor: pointer;
+    z-index: 1000;
+
+    background: white;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-fixed:hover {
+    transform: scale(1.1);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.25);
+}
+
+/* ================= FIXED HOME BUTTON ================= */
+.home-fixed {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 8px 14px;
+    font-size: 15px;
+    font-weight: 600;
+
+    background: white;
+    color: #2563eb;
+
+    border-radius: 999px;
+    cursor: pointer;
+    z-index: 9999;
+
+    box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-fixed:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+}
+
+.home-fixed span {
+    margin-top: 1px;
+}
+
+
+
+</style>
+</head>
+
+<body>
+
+
+
+<div class="wrapper">
+    <div class="top-bar">
+    <body>
+
+<div class="home-fixed" onclick="goHome()">
+    🏠 <span>Home</span>
+</div>
+
+    </div>
+
+
+    <div class="bell">🔔</div>
+
+    <div id="notificationList" class="notifications"></div>
+    <div id="emptyState" class="empty hidden">No notifications</div>
+</div>
+
+<!-- DETAILS MODAL -->
+<div id="detailsModal" class="modal hidden">
+    <div class="modal-box">
+        <div id="detailsContent"></div>
+        <div style="text-align:right;">
+            <button onclick="closeDetails()">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const customerId = "{{ customer_id }}";
+let activeNotificationId = null;
+
+/* LOAD NOTIFICATIONS */
+function loadNotifications() {
+    fetch(`/client/api/notifications/${customerId}`)
+        .then(r => r.json())
+        .then(data => {
+            const list = document.getElementById("notificationList");
+            const empty = document.getElementById("emptyState");
+            list.innerHTML = "";
+
+            if (!data.length) {
+                empty.classList.remove("hidden");
+                return;
+            }
+            empty.classList.add("hidden");
+
+            data.forEach(n => {
+                let subtitle = "";
+                let icon = "📦";
+
+                if (n.state === "ACCEPTED") {
+                    subtitle = `Delivery: ${n.arrival_date}`;
+                    icon = "🚚";
+                }
+                if (n.state === "INVOICE") {
+                    subtitle = "Invoice available";
+                    icon = "🧾";
+                }
+
+                list.innerHTML += `
+                    <div class="notification-card">
+                        <div class="left">
+                            <div class="icon">${icon}</div>
+                            <div class="text">
+                                <b>Order ${n.order_no}</b>
+                                <span>${subtitle}</span>
+                            </div>
+                        </div>
+                        <div class="action"
+                             onclick="${
+                                n.state === 'INVOICE'
+                                ? `openInvoice('${n.order_id}','${n.notification_id}')`
+                                : `viewDetails('${n.order_id}','${n.notification_id}','${n.arrival_date}')`
+                             }">
+                            →
+                        </div>
+                    </div>
+                `;
+            });
+        });
+}
+
+/* VIEW DETAILS */
+function viewDetails(orderId, notificationId, arrivalDate) {
+    activeNotificationId = notificationId;
+
+    fetch(`/admin/api/order/details/${orderId}`)
+        .then(r => r.json())
+        .then(o => {
+            let html = `<h3>Order ${o.order_no}</h3><ul>`;
+            o.items.forEach(i => {
+                html += `<li>${i.name} × ${i.quantity}</li>`;
+            });
+            html += `</ul><b>Delivery:</b> ${arrivalDate}`;
+
+            document.getElementById("detailsContent").innerHTML = html;
+            document.getElementById("detailsModal").classList.remove("hidden");
+        });
+}
+
+/* CLOSE DETAILS */
+function closeDetails() {
+    document.getElementById("detailsModal").classList.add("hidden");
+
+    fetch(`/admin/notification/delete/${activeNotificationId}`, {
+        method: "POST"
+    }).then(loadNotifications);
+}
+
+/* INVOICE */
+function openInvoice(orderId, notificationId) {
+    fetch(`/admin/notification/delete/${notificationId}`, {
+        method: "POST"
+    }).then(() => {
+        window.open(`/invoice/${orderId}`, "_blank");
+        loadNotifications();
+    });
+}
+
+
+function goHome() {
+    window.location.href = `/client/${customerId}`;
+}
+
+
+loadNotifications();
+</script>
+
+</body>
+</html>
